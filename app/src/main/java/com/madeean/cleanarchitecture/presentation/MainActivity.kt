@@ -2,23 +2,32 @@ package com.madeean.cleanarchitecture.presentation
 
 import android.os.Bundle
 import androidx.activity.enableEdgeToEdge
+import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import com.madeean.cleanarchitecture.R
 import com.madeean.cleanarchitecture.databinding.ActivityMainBinding
 import com.madeean.cleanarchitecture.di.DepedencyInjection
-import com.madeean.cleanarchitecture.domain.UseCase
 
 class MainActivity : AppCompatActivity() {
   private lateinit var binding: ActivityMainBinding
-  private val useCase: UseCase = DepedencyInjection.getUseCaseInstance()
+  private val viewModel: ViewModel by viewModels {
+    Factory(DepedencyInjection.useCaseInstance)
+  }
   override fun onCreate(savedInstanceState: Bundle?) {
     super.onCreate(savedInstanceState)
     binding = ActivityMainBinding.inflate(layoutInflater)
     enableEdgeToEdge()
     setContentView(binding.root)
+    setObserve()
 
     binding.btnGetData.setOnClickListener {
-      setUi(useCase.getData())
+      viewModel.getData()
+    }
+  }
+
+  private fun setObserve() {
+    viewModel.data.observe(this){
+      if (it.isNotBlank()) setUi(it)
     }
   }
 
